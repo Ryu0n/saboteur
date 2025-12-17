@@ -15,14 +15,18 @@ By "attacking" your data with various mutation strategies, Saboteur helps you un
 -   **Simple API**: Get started in seconds with the intuitive `.attack()` method.
 -   **Randomized Mutations**: Automatically selects a random field and applies a random, applicable mutation to simulate real-world unpredictability.
 -   **Extensible**: Easily create and add your own custom mutation strategies to fit your specific needs.
--   **Zero Dependencies**: A pure Python library that can be dropped into any project without extra baggage.
+-   **Lightweighted Dependencies**: A pure Python library that can be dropped into any project without extra baggage.
 
 ## 💾 Installation
 
 Install Saboteur directly from PyPI:
 
 ```bash
+# pip
 pip install saboteur
+
+# poetry
+pip install poetry && poetry add saboteur
 ```
 
 ## 🚀 Quick Start
@@ -33,6 +37,7 @@ Using Saboteur is straightforward. Import the `Saboteur` class and the desired s
 from saboteur.application.facade import Saboteur
 from saboteur.infrastructure.strategies.injections import NullInjectionStrategy
 from saboteur.infrastructure.strategies.flippings import TypeFlipStrategy
+from saboteur.domain.mutation.configs import MutationConfig
 
 # 1. Define the strategies you want to use
 strategies = [
@@ -40,10 +45,17 @@ strategies = [
     TypeFlipStrategy(),
 ]
 
-# 2. Initialize Saboteur with your strategies
-saboteur = Saboteur(strategies=strategies)
+# 2. Set configuration what you want
+config = MutationConfig(
+    strategies=strategies,
+    apply_all_strategies=True,
+    apply_all_keys=True,
+)
 
-# 3. Prepare your data
+# 3. Initialize Saboteur with your configuration
+saboteur = Saboteur(config=config)
+
+# 4. Prepare your data
 mock_data = {
     "user_id": 12345,
     "username": "test_user",
@@ -51,7 +63,7 @@ mock_data = {
     "score": 987
 }
 
-# 4. Attack the data!
+# 5. Attack the data!
 # Saboteur will randomly pick one key (e.g., "user_id") and apply one
 # applicable strategy (e.g., TypeFlipStrategy).
 mutated_data = saboteur.attack(mock_data)
@@ -92,6 +104,7 @@ Here's an example of a `BooleanFlipStrategy` that flips `True` to `False` and vi
 from typing import Any
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.contexts import MutationContext
+from saboteur.domain.mutation.configs import MutationConfig
 
 class BooleanFlipStrategy(MutationStrategy):
     """Flips a boolean value."""
@@ -108,7 +121,13 @@ strategies = [
     BooleanFlipStrategy(),
     # ... other strategies
 ]
-saboteur = Saboteur(strategies=strategies)
+
+config = MutationConfig(
+    strategies=strategies,
+    ... # other options
+)
+
+saboteur = Saboteur(config=config)
 ```
 
 ## 🤝 Contributing
