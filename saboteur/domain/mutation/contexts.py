@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import TypeVar, Generic, Type
+from typing import Generic, Type
 
+from saboteur.utils.generic import T
 
-T = TypeVar('T')
 
 @dataclass(frozen=True)
 class MutationContext(Generic[T]):
