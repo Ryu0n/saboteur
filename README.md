@@ -1,7 +1,6 @@
 # Saboteur
 
 [![PyPI version](https://badge.fury.io/py/saboteur.svg)](https://badge.fury.io/py/saboteur)
-[![Build Status](https://travis-ci.org/user/repo.svg?branch=main)](https://travis-ci.org/user/repo)
 
 A simple and extensible data mutation library for Chaos Engineering in Python.
 
