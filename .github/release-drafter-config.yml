@@ -1,0 +1,31 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🎁 New features available'
+    label: '🎁 feature'
+  - title: '🐞 Bug fixes'
+    label: '🔨 fix'
+  - title: '🐬 Code improvements'
+    label:
+      - '📋 docs'
+      - '🧼 refactor'
+      - '🪄 setting'
+      - '🎫 test'
+      - '🚀 deploy'
+change-template: '- $TITLE #$NUMBER @$AUTHOR '
+template: |
+  ## Changes in this version
+  ---
+  $CHANGES
+no-changes-template: 'No changes available'
+version-resolver:
+  major:
+    labels:
+      - '✨ major'
+  minor:
+    labels:
+      - '✨ minor'
+  patch:
+    labels:
+      - '✨ patch'
+  default: 'patch'

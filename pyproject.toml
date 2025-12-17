@@ -1,12 +1,12 @@
 [project]
 name = "saboteur"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = [
     {name = "Ryu0n",email = "hsung951027@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<4.0"
 dependencies = [
 ]
 
