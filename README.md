@@ -90,8 +90,8 @@ Here's an example of a `BooleanFlipStrategy` that flips `True` to `False` and vi
 ```python
 # custom_strategies.py
 from typing import Any
-from saboteur.domain.strategies import MutationStrategy
-from saboteur.domain.contexts import MutationContext
+from saboteur.domain.mutation.strategies import MutationStrategy
+from saboteur.domain.mutation.contexts import MutationContext
 
 class BooleanFlipStrategy(MutationStrategy):
     """Flips a boolean value."""

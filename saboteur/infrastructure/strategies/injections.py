@@ -1,6 +1,6 @@
 from typing import Any
-from saboteur.domain.strategies import MutationStrategy
-from saboteur.domain.contexts import MutationContext
+from saboteur.domain.mutation.strategies import MutationStrategy
+from saboteur.domain.mutation.contexts import MutationContext
 
 
 class NullInjectionStrategy(MutationStrategy):

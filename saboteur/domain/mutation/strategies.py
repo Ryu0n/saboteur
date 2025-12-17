@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from saboteur.domain.contexts import MutationContext
+from saboteur.domain.mutation.contexts import MutationContext
 
 
 class MutationStrategy(ABC):

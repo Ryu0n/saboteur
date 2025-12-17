@@ -2,8 +2,8 @@ import copy
 import random
 
 from typing import List, Dict, Any
-from saboteur.domain.strategies import MutationStrategy
-from saboteur.domain.contexts import MutationContext
+from saboteur.domain.mutation.strategies import MutationStrategy
+from saboteur.domain.mutation.contexts import MutationContext
 
 
 class Saboteur:
