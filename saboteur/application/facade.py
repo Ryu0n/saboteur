@@ -2,9 +2,11 @@ import copy
 import random
 
 from typing import List, Dict, Any
+
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.contexts import MutationContext
 from saboteur.domain.mutation.configs import MutationConfig
+from saboteur.utils.sampling import uniform_sample_from_dict
 
 
 class Saboteur:
@@ -24,11 +26,10 @@ class Saboteur:
         return mutated
     
     def _wrap_into_contexts(self, data: Dict[str, Any]) -> List[MutationContext]:
-        key = random.choice(list(data.keys()))
-        value = data[key]
+        key_paths, value = uniform_sample_from_dict(data)
         return [
             MutationContext(
-                path=key,
+                key_paths=key_paths,
                 original_value=value,
                 original_type=type(value)
             )
@@ -38,21 +39,21 @@ class Saboteur:
         _data = copy.deepcopy(data)
         contexts = self._wrap_into_contexts(_data)
         
-        for index, context in enumerate(contexts):
+        for context in contexts:
             candidates = self._get_applicable_strategies(context)
             if not candidates:
                 continue
             if self.__config.apply_all_strategies:
                 for strategy in candidates:
-                    mutated_value = strategy.apply(context)
-                    _data[context.path] = mutated_value
+                    mutated = strategy.apply(context)
+                    _data = mutated.mutate(_data)
             else:
                 strategies_to_apply = random.sample(
                     population=candidates,
                     k=self.__config.num_strategies_to_apply,
                 )
                 for strategy in strategies_to_apply:
-                    mutated_value = strategy.apply(context)
-                    _data[context.path] = mutated_value
+                    mutated = strategy.apply(context)
+                    _data = mutated.mutate(_data)
 
         return _data
