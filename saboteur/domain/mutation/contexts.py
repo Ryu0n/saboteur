@@ -1,3 +1,5 @@
+import copy
+
 from dataclasses import dataclass
 from typing import Generic, Type
 
@@ -14,3 +16,15 @@ class MutationContext(Generic[T]):
     key_paths: list[str]
     original_value: T
     original_type: Type[T]
+    
+    def mutate(self, data: dict) -> dict:
+        copied = copy.deepcopy(data)
+        temp = copied
+        
+        for k in self.key_paths[:-1]:
+            temp = temp[k]
+            if not isinstance(temp, dict):
+                raise ValueError(f"Invalid key path: {self.key_paths}")
+
+        temp[self.key_paths[-1]] = self.original_value
+        return copied
