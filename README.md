@@ -49,7 +49,6 @@ strategies = [
 config = MutationConfig(
     strategies=strategies,
     apply_all_strategies=True,
-    apply_all_keys=True,
 )
 
 # 3. Initialize Saboteur with your configuration

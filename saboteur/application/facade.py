@@ -24,33 +24,21 @@ class Saboteur:
         return mutated
     
     def _wrap_into_contexts(self, data: Dict[str, Any]) -> List[MutationContext]:
-        if self.__config.apply_all_keys:
-            return [
-                MutationContext(
-                    path=key,
-                    original_value=value,
-                    original_type=type(value)
-                )
-                for key, value in data.items()
-            ]
-        else:
-            key = random.choice(list(data.keys()))
-            value = data[key]
-            return [
-                MutationContext(
-                    path=key,
-                    original_value=value,
-                    original_type=type(value)
-                )
-            ] 
+        key = random.choice(list(data.keys()))
+        value = data[key]
+        return [
+            MutationContext(
+                path=key,
+                original_value=value,
+                original_type=type(value)
+            )
+        ] 
     
     def attack(self, data: Dict[str, Any]) -> Dict[str, Any]:
         _data = copy.deepcopy(data)
         contexts = self._wrap_into_contexts(_data)
         
         for index, context in enumerate(contexts):
-            if not self.__config.apply_all_keys and index >= self.__config.num_keys_to_apply:
-                break
             candidates = self._get_applicable_strategies(context)
             if not candidates:
                 continue

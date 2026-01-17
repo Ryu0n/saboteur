@@ -24,28 +24,26 @@ def mock_data():
     }
 
 @pytest.mark.parametrize(
-    "strategies, apply_all_strategies, apply_all_keys, num_strategies_to_apply, num_keys_to_apply",
+    "strategies, apply_all_strategies, num_strategies_to_apply",
     [
-        ([NullInjectionStrategy(),], True, True, None, None),
-        ([TypeFlipStrategy(from_type=str, to_type=int),], True, True, None, None),
-        ([NullInjectionStrategy(), TypeFlipStrategy()], True, True, None, None),
-        ([NullInjectionStrategy(),], True, False, None, 1),
-        ([TypeFlipStrategy(),], True, False, None, 1),
-        ([NullInjectionStrategy(), TypeFlipStrategy()], True, False, None, 1),
-        ([NullInjectionStrategy(),], False, True, 1, None),
-        ([TypeFlipStrategy(),], False, True, 1, None),
-        ([NullInjectionStrategy(), TypeFlipStrategy()], False, True, 1, None),
-        ([NullInjectionStrategy(),], False, False, 1, 1),
-        ([TypeFlipStrategy(),], False, False, 1, 1),
-        ([NullInjectionStrategy(), TypeFlipStrategy()], False, False, 1, 1),
+        ([NullInjectionStrategy(),], True, None),
+        ([TypeFlipStrategy(from_type=str, to_type=int),], True, None),
+        ([NullInjectionStrategy(), TypeFlipStrategy()], True, None),
+        ([NullInjectionStrategy(),], True, None),
+        ([TypeFlipStrategy(),], True, None),
+        ([NullInjectionStrategy(), TypeFlipStrategy()], True, None),
+        ([NullInjectionStrategy(),], False, 1),
+        ([TypeFlipStrategy(),], False, 1),
+        ([NullInjectionStrategy(), TypeFlipStrategy()], False, 1),
+        ([NullInjectionStrategy(),], False, 1),
+        ([TypeFlipStrategy(),], False, 1),
+        ([NullInjectionStrategy(), TypeFlipStrategy()], False, 1),
     ]
 )
 def test_saboteur_mutations(
     strategies: List[MutationStrategy],
     apply_all_strategies: bool,
-    apply_all_keys: bool,
     num_strategies_to_apply: int,
-    num_keys_to_apply: int,
     mock_data,
     logger,
 ):
@@ -54,9 +52,7 @@ def test_saboteur_mutations(
     config = MutationConfig(
         strategies=strategies,
         apply_all_strategies=apply_all_strategies,
-        apply_all_keys=apply_all_keys,
         num_strategies_to_apply=num_strategies_to_apply,
-        num_keys_to_apply=num_keys_to_apply,
     )
     
     saboteur = Saboteur(config=config)

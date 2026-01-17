@@ -14,8 +14,6 @@ class MutationConfig(BaseModel):
     strategies: List[MutationStrategy] = Field(default_factory=list, description="List of mutation strategies to be used.")
     apply_all_strategies: bool = Field(default=True, description="Flag to determine if all applicable strategies should be applied.")
     num_strategies_to_apply: Optional[int] = Field(default=None, description="Number of strategies to apply randomly if not applying all.")
-    apply_all_keys: bool = Field(default=True, description="Flag to determine if mutations should be applied to all keys in the data structure.")
-    num_keys_to_apply: Optional[int] = Field(default=None, description="Number of keys to mutate randomly if not applying to all keys.")
     
     @model_validator(mode="after")
     def validate_strategy_counts(self):
@@ -26,17 +24,5 @@ class MutationConfig(BaseModel):
         else:
             assert self.num_strategies_to_apply is not None or self.num_strategies_to_apply > 0, (
                 "num_strategies_to_apply should be a positive integer or not None when apply_all_strategies is False."
-            )
-        return self
-    
-    @model_validator(mode="after")
-    def validate_key_counts(self):
-        if self.apply_all_keys:
-            assert self.num_keys_to_apply is None, (
-                "num_keys_to_apply should be None when apply_all_keys is True."
-            )
-        else:
-            assert self.num_keys_to_apply is not None or self.num_keys_to_apply > 0, (
-                "num_keys_to_apply should be a positive integer or not None when apply_all_keys is False."
             )
         return self
