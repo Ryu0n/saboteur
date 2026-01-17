@@ -11,6 +11,6 @@ class MutationContext(Generic[T]):
     Args:
         Generic (T): The type of the original value.
     """
-    path: str
+    key_paths: list[str]
     original_value: T
     original_type: Type[T]
