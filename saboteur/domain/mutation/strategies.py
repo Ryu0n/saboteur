@@ -8,5 +8,5 @@ class MutationStrategy(ABC):
         pass
     
     @abstractmethod
-    def apply(self, context: MutationContext) -> object:
+    def apply(self, context: MutationContext) -> MutationContext:
         pass

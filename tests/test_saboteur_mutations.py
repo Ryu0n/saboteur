@@ -24,7 +24,7 @@ def mock_data():
     "strategies, apply_all_strategies, num_strategies_to_apply",
     [
         ([NullInjectionStrategy(),], True, None),
-        ([TypeFlipStrategy(from_type=str, to_type=int),], True, None),
+        ([TypeFlipStrategy(to_type=int),], True, None),
         ([NullInjectionStrategy(), TypeFlipStrategy()], True, None),
         ([NullInjectionStrategy(),], True, None),
         ([TypeFlipStrategy(),], True, None),
