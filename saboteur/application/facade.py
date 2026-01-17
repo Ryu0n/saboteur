@@ -48,7 +48,9 @@ class Saboteur:
         _data = copy.deepcopy(data)
         contexts = self._wrap_into_contexts(_data)
         
-        for context in contexts:
+        for index, context in enumerate(contexts):
+            if not self.__config.apply_all_keys and index >= self.__config.num_keys_to_apply:
+                break
             candidates = self._get_applicable_strategies(context)
             if not candidates:
                 continue
@@ -57,8 +59,12 @@ class Saboteur:
                     mutated_value = strategy.apply(context)
                     _data[context.path] = mutated_value
             else:
-                strategy = random.choice(candidates)
-                mutated_value = strategy.apply(context)
-                _data[context.path] = mutated_value
-        
+                strategies_to_apply = random.sample(
+                    population=candidates,
+                    k=self.__config.num_strategies_to_apply,
+                )
+                for strategy in strategies_to_apply:
+                    mutated_value = strategy.apply(context)
+                    _data[context.path] = mutated_value
+
         return _data

@@ -12,9 +12,9 @@ class MutationConfig(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
     
     strategies: List[MutationStrategy] = Field(default_factory=list, description="List of mutation strategies to be used.")
-    apply_all_strategies: bool = Field(default=False, description="Flag to determine if all applicable strategies should be applied.")
+    apply_all_strategies: bool = Field(default=True, description="Flag to determine if all applicable strategies should be applied.")
     num_strategies_to_apply: Optional[int] = Field(default=None, description="Number of strategies to apply randomly if not applying all.")
-    apply_all_keys: bool = Field(default=False, description="Flag to determine if mutations should be applied to all keys in the data structure.")
+    apply_all_keys: bool = Field(default=True, description="Flag to determine if mutations should be applied to all keys in the data structure.")
     num_keys_to_apply: Optional[int] = Field(default=None, description="Number of keys to mutate randomly if not applying to all keys.")
     
     @model_validator(mode="after")
