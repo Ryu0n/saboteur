@@ -1,0 +1,15 @@
+{
+    "age": 25,
+    "name": "John",
+    "active": true,
+    "score": null,
+    "nested": {
+        "height": 175.5,
+        "weight": 70,
+        "hobbies": ["reading", "gaming"],
+        "nested_level_2": {
+            "city": "New York",
+            "country": "USA"
+        }
+    }
+}

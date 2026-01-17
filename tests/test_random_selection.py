@@ -1,4 +1,4 @@
-import logging
+import json
 import pytest
 import random
 
@@ -10,21 +10,8 @@ def logger():
 
 @pytest.fixture
 def mock_data():
-    return {
-        "age": 25,
-        "name": "John",
-        "active": True,
-        "score": None,
-        "nested": {
-            "height": 175.5,
-            "weight": 70,
-            "hobbies": ["reading", "gaming"],
-            "nested_level_2": {
-                "city": "New York",
-                "country": "USA"
-            }
-        }
-    }
+    with open("tests/resources/mock.json", "r") as json_file:
+        return json.load(json_file)
 
 
 def travel(data: dict, logger: logging.Logger, threshold=0.5):

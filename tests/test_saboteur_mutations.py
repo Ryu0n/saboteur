@@ -1,5 +1,6 @@
-import logging
+import json
 import pytest
+import logging
 
 from typing import List
 
@@ -16,12 +17,8 @@ def logger():
 
 @pytest.fixture
 def mock_data():
-    return {
-        "age": 25,
-        "name": "John",
-        "active": True,
-        "score": None
-    }
+    with open("tests/resources/mock.json", "r") as json_file:
+        return json.load(json_file)
 
 @pytest.mark.parametrize(
     "strategies, apply_all_strategies, num_strategies_to_apply",
