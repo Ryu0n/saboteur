@@ -24,7 +24,7 @@ def mock_data():
     }
 
 @pytest.mark.parametrize(
-    "strategies, apply_all_strategies, apply_all_keys, num_strategies, num_keys",
+    "strategies, apply_all_strategies, apply_all_keys, num_strategies_to_apply, num_keys_to_apply",
     [
         ([NullInjectionStrategy(),], True, True, None, None),
         ([TypeFlipStrategy(from_type=str, to_type=int),], True, True, None, None),
@@ -44,8 +44,8 @@ def test_saboteur_mutations(
     strategies: List[MutationStrategy],
     apply_all_strategies: bool,
     apply_all_keys: bool,
-    num_strategies: int,
-    num_keys: int,
+    num_strategies_to_apply: int,
+    num_keys_to_apply: int,
     mock_data,
     logger,
 ):
@@ -55,8 +55,8 @@ def test_saboteur_mutations(
         strategies=strategies,
         apply_all_strategies=apply_all_strategies,
         apply_all_keys=apply_all_keys,
-        num_strategies=num_strategies,
-        num_keys=num_keys,
+        num_strategies_to_apply=num_strategies_to_apply,
+        num_keys_to_apply=num_keys_to_apply,
     )
     
     saboteur = Saboteur(config=config)

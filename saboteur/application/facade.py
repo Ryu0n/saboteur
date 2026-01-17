@@ -8,6 +8,8 @@ from saboteur.domain.mutation.configs import MutationConfig
 
 
 class Saboteur:
+    """Facade for the saboteur mutation framework."""
+    
     def __init__(self, config: MutationConfig):
         self.__config = config
     
@@ -21,7 +23,7 @@ class Saboteur:
             mutated.append(mutated_value)
         return mutated
     
-    def _wrap_into_mutations(self, data: Dict[str, Any]) -> List[MutationContext]:
+    def _wrap_into_contexts(self, data: Dict[str, Any]) -> List[MutationContext]:
         if self.__config.apply_all_keys:
             return [
                 MutationContext(
@@ -44,7 +46,7 @@ class Saboteur:
     
     def attack(self, data: Dict[str, Any]) -> Dict[str, Any]:
         _data = copy.deepcopy(data)
-        contexts = self._wrap_into_mutations(_data)
+        contexts = self._wrap_into_contexts(_data)
         
         for context in contexts:
             candidates = self._get_applicable_strategies(context)
