@@ -53,7 +53,7 @@ def test_saboteur_mutations(
     )
     
     saboteur = Saboteur(config=config)
-    mutated_data = saboteur.attack(mock_data)
+    mutated_data = saboteur.mutate(mock_data)
     
     logger.debug(f"Original data: {mock_data}")
     logger.debug(f"Mutated data: {mutated_data}")

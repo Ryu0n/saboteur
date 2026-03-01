@@ -35,7 +35,7 @@ class Saboteur:
             )
         ] 
     
-    def attack(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def mutate(self, data: Dict[str, Any]) -> Dict[str, Any]:
         _data = copy.deepcopy(data)
         contexts = self._wrap_into_contexts(_data)
         
