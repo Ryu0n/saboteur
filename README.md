@@ -38,6 +38,15 @@ from saboteur.application.facade import Saboteur
 from saboteur.infrastructure.mutation.strategies.injections import NullInjectionStrategy
 from saboteur.infrastructure.mutation.strategies.flippings import TypeFlipStrategy
 from saboteur.domain.mutation.configs import MutationConfig
+from saboteur.domain.mutation.runner import MutationRunner
+
+# 0. Prepare your data
+mock_data = {
+    "user_id": 12345,
+    "username": "test_user",
+    "is_active": True,
+    "score": 987
+}
 
 # 1. Define the strategies you want to use
 strategies = [
@@ -49,41 +58,42 @@ strategies = [
 config = MutationConfig(
     strategies=strategies,
     apply_all_strategies=True,
+    original_data=mock_data,
 )
 
-# 3. Initialize Saboteur with your configuration
-saboteur = Saboteur(config=config)
+# 3. Initialize runners with corresponding configuration within Sabeteur Facade.
+saboteur = Saboteur(
+    runners=[
+        MutationRunner(
+            config=config,
+        )
+    ]
+)
 
-# 4. Prepare your data
-mock_data = {
-    "user_id": 12345,
-    "username": "test_user",
-    "is_active": True,
-    "score": 987
-}
-
-# 5. Mutate the data!
+# 4. Mutate the data!
 # Saboteur will randomly pick one key (e.g., "user_id") and apply one
 # applicable strategy (e.g., TypeFlipStrategy).
-mutated_data = saboteur.mutate(mock_data)
+results = saboteur.run()
 
-# Example output: {'user_id': '12345', 'username': 'test_user', ...}
-# Or: {'user_id': 12345, 'username': None, ...}
-print(mutated_data)
+# 5. Each runner's results is returned!
+# Example output: {4332166016: MutationResult(result={'age': 25, 'name': 'John', 'active': None, 'score': None, 'nested': {'height': 175.5, 'weight': 70, 'hobbies': ['reading', 'gaming'], 'nested_level_2': {'city': 'New York', 'country': 'USA'}}}, created_at='2026-03-02T07:47:15.115957+09:00', elapsed_time=3.724999260157347e-05)}
+print(results)
 ```
 
 ## 🛠️ Available Strategies
 
 Saboteur comes with a set of built-in strategies to get you started.
 
-### `NullInjectionStrategy`
+## Strategies for `MutationRunner`
+
+#### `NullInjectionStrategy`
 
 Replaces the original value of a field with `None`. This is useful for testing how your code handles missing or null data.
 
 -   **Applicable when**: The original value is not `None`.
 -   **Mutation**: `original_value` -> `None`
 
-### `TypeFlipStrategy`
+#### `TypeFlipStrategy`
 
 Changes the data type of a field. Currently supports `int` to `str` and `str` to `int` conversions. This helps test for `TypeError` exceptions and weak typing issues.
 
@@ -92,7 +102,7 @@ Changes the data type of a field. Currently supports `int` to `str` and `str` to
     -   `int` -> `str` (e.g., `123` -> `'123'`)
     -   `str` -> `int` (e.g., `'456'` -> `456`). If the string is not a digit, it returns `-1`.
 
-### `RandomizationStrategy`
+#### `RandomizationStrategy`
 
 Replaces a value with a randomized value of the same type. This is useful for testing how your system handles a wide range of valid but unexpected inputs. Saboteur provides several randomization strategies based on data type.
 
@@ -133,6 +143,7 @@ from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.contexts import MutationContext
 from saboteur.domain.mutation.configs import MutationConfig
 
+
 class BooleanFlipStrategy(MutationStrategy):
     """Flips a boolean value."""
     def is_applicable(self, context: MutationContext) -> bool:
@@ -153,8 +164,6 @@ config = MutationConfig(
     strategies=strategies,
     ... # other options
 )
-
-saboteur = Saboteur(config=config)
 ```
 
 ## 🤝 Contributing
