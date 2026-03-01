@@ -1,59 +1,33 @@
-import copy
-import random
-
-from typing import List, Dict, Any
-
-from saboteur.domain.mutation.strategies import MutationStrategy
-from saboteur.domain.mutation.contexts import MutationContext
-from saboteur.domain.mutation.configs import MutationConfig
-from saboteur.utils.sampling import uniform_sample_from_dict
+from saboteur.domain.base.runner import BaseRunner
 
 
 class Saboteur:
     """Facade for the saboteur mutation framework."""
 
-    def __init__(self, config: MutationConfig):
-        self.__config = config
+    def __init__(self, runners: list[BaseRunner]):
+        self.__runners = {id(runner): runner for runner in runners}
 
-    def _get_applicable_strategies(
-        self, context: MutationContext
-    ) -> List[MutationStrategy]:
-        return [s for s in self.__config.strategies if s.is_applicable(context)]
+    def register_runner(self, runner: BaseRunner):
+        """Register a new runner to the saboteur."""
+        self.__runners[id(runner)] = runner
 
-    def _mutate(self, context: MutationContext) -> List[object]:
-        mutated = []
-        for strategy in self._get_applicable_strategies(context):
-            mutated_value = strategy.apply(context)
-            mutated.append(mutated_value)
-        return mutated
+    def unregister_runner(self, runner: BaseRunner):
+        """Unregister a runner from the saboteur."""
+        if id(runner) in self.__runners:
+            del self.__runners[id(runner)]
 
-    def _wrap_into_contexts(self, data: Dict[str, Any]) -> List[MutationContext]:
-        key_paths, value = uniform_sample_from_dict(data)
-        return [
-            MutationContext(
-                key_paths=key_paths, original_value=value, original_type=type(value)
-            )
-        ]
+    def list_runners(self) -> list[BaseRunner]:
+        """List all registered runners."""
+        return list(self.__runners.values())
 
-    def mutate(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        _data = copy.deepcopy(data)
-        contexts = self._wrap_into_contexts(_data)
+    def get_runner(self, runner_id: int) -> BaseRunner:
+        """Get a runner by its ID."""
+        return self.__runners.get(runner_id)
 
-        for context in contexts:
-            candidates = self._get_applicable_strategies(context)
-            if not candidates:
-                continue
-            if self.__config.apply_all_strategies:
-                for strategy in candidates:
-                    mutated = strategy.apply(context)
-                    _data = mutated.mutate(_data)
-            else:
-                strategies_to_apply = random.sample(
-                    population=candidates,
-                    k=self.__config.num_strategies_to_apply,
-                )
-                for strategy in strategies_to_apply:
-                    mutated = strategy.apply(context)
-                    _data = mutated.mutate(_data)
-
-        return _data
+    def run(self) -> list:
+        """Run all registered runners and return their results."""
+        results = {}
+        for id_runner, runner in self.__runners.items():
+            result = runner.run()
+            results[id_runner] = result
+        return results
