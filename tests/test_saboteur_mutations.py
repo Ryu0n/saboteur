@@ -5,8 +5,8 @@ import logging
 from typing import List
 
 from saboteur.application.facade import Saboteur
-from saboteur.infrastructure.strategies.injections import NullInjectionStrategy
-from saboteur.infrastructure.strategies.flippings import TypeFlipStrategy
+from saboteur.infrastructure.mutation.strategies.injections import NullInjectionStrategy
+from saboteur.infrastructure.mutation.strategies.flippings import TypeFlipStrategy
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.configs import MutationConfig
 

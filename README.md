@@ -35,8 +35,8 @@ Using Saboteur is straightforward. Import the `Saboteur` class and the desired s
 
 ```python
 from saboteur.application.facade import Saboteur
-from saboteur.infrastructure.strategies.injections import NullInjectionStrategy
-from saboteur.infrastructure.strategies.flippings import TypeFlipStrategy
+from saboteur.infrastructure.mutation.strategies.injections import NullInjectionStrategy
+from saboteur.infrastructure.mutation.strategies.flippings import TypeFlipStrategy
 from saboteur.domain.mutation.configs import MutationConfig
 
 # 1. Define the strategies you want to use
