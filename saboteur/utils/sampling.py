@@ -1,7 +1,9 @@
 import random
 
 
-def uniform_sample_from_dict(data: dict, stop_threshold=0.5) -> tuple[list[str], object]:
+def uniform_sample_from_dict(
+    data: dict, stop_threshold=0.5
+) -> tuple[list[str], object]:
     key_paths: list[str] = []
 
     def _sample(d: dict) -> tuple[str, object]:

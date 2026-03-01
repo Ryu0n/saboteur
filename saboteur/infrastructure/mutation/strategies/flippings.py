@@ -25,12 +25,12 @@ class TypeFlipStrategy(MutationStrategy):
         try:
             logger.debug(
                 f"TypeFlipStrategy converting "
-                f"{".".join(context.key_paths)}({context.original_value}) to {self.__to}"
+                f"{'.'.join(context.key_paths)}({context.original_value}) to {self.__to}"
             )
             return MutationContext(
                 key_paths=context.key_paths,
                 original_value=self.__to(context.original_value),
-                original_type=self.__to
+                original_type=self.__to,
             )
         except Exception as e:
             logger.warning(

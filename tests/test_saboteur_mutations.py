@@ -15,27 +15,77 @@ from saboteur.domain.mutation.configs import MutationConfig
 def logger():
     return logging.getLogger("saboteur")
 
+
 @pytest.fixture
 def mock_data():
     with open("tests/resources/mock.json", "r") as json_file:
         return json.load(json_file)
 
+
 @pytest.mark.parametrize(
     "strategies, apply_all_strategies, num_strategies_to_apply",
     [
-        ([NullInjectionStrategy(),], True, None),
-        ([TypeFlipStrategy(to_type=int),], True, None),
+        (
+            [
+                NullInjectionStrategy(),
+            ],
+            True,
+            None,
+        ),
+        (
+            [
+                TypeFlipStrategy(to_type=int),
+            ],
+            True,
+            None,
+        ),
         ([NullInjectionStrategy(), TypeFlipStrategy()], True, None),
-        ([NullInjectionStrategy(),], True, None),
-        ([TypeFlipStrategy(),], True, None),
+        (
+            [
+                NullInjectionStrategy(),
+            ],
+            True,
+            None,
+        ),
+        (
+            [
+                TypeFlipStrategy(),
+            ],
+            True,
+            None,
+        ),
         ([NullInjectionStrategy(), TypeFlipStrategy()], True, None),
-        ([NullInjectionStrategy(),], False, 1),
-        ([TypeFlipStrategy(),], False, 1),
+        (
+            [
+                NullInjectionStrategy(),
+            ],
+            False,
+            1,
+        ),
+        (
+            [
+                TypeFlipStrategy(),
+            ],
+            False,
+            1,
+        ),
         ([NullInjectionStrategy(), TypeFlipStrategy()], False, 1),
-        ([NullInjectionStrategy(),], False, 1),
-        ([TypeFlipStrategy(),], False, 1),
+        (
+            [
+                NullInjectionStrategy(),
+            ],
+            False,
+            1,
+        ),
+        (
+            [
+                TypeFlipStrategy(),
+            ],
+            False,
+            1,
+        ),
         ([NullInjectionStrategy(), TypeFlipStrategy()], False, 1),
-    ]
+    ],
 )
 def test_saboteur_mutations(
     strategies: List[MutationStrategy],
@@ -45,19 +95,19 @@ def test_saboteur_mutations(
     logger,
 ):
     logger.debug(f"Testing with strategies: {strategies}")
-    
+
     config = MutationConfig(
         strategies=strategies,
         apply_all_strategies=apply_all_strategies,
         num_strategies_to_apply=num_strategies_to_apply,
     )
-    
+
     saboteur = Saboteur(config=config)
     mutated_data = saboteur.mutate(mock_data)
-    
+
     logger.debug(f"Original data: {mock_data}")
     logger.debug(f"Mutated data: {mutated_data}")
-    
+
     assert isinstance(mutated_data, dict)
     assert set(mutated_data.keys()) == set(mock_data.keys())
     # assert mock_data != mutated_data
