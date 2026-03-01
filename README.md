@@ -12,7 +12,7 @@ By "attacking" your data with various mutation strategies, Saboteur helps you un
 
 ## ✨ Key Features
 
--   **Simple API**: Get started in seconds with the intuitive `.attack()` method.
+-   **Simple API**: Get started in seconds with the intuitive `.mutate()` method.
 -   **Randomized Mutations**: Automatically selects a random field and applies a random, applicable mutation to simulate real-world unpredictability.
 -   **Extensible**: Easily create and add your own custom mutation strategies to fit your specific needs.
 -   **Lightweighted Dependencies**: A pure Python library that can be dropped into any project without extra baggage.
@@ -31,7 +31,7 @@ pip install poetry && poetry add saboteur
 
 ## 🚀 Quick Start
 
-Using Saboteur is straightforward. Import the `Saboteur` class and the desired strategies, then call the `attack` method on your data.
+Using Saboteur is straightforward. Import the `Saboteur` class and the desired strategies, then call the `mutate` method on your data.
 
 ```python
 from saboteur.application.facade import Saboteur
@@ -62,10 +62,10 @@ mock_data = {
     "score": 987
 }
 
-# 5. Attack the data!
+# 5. Mutate the data!
 # Saboteur will randomly pick one key (e.g., "user_id") and apply one
 # applicable strategy (e.g., TypeFlipStrategy).
-mutated_data = saboteur.attack(mock_data)
+mutated_data = saboteur.mutate(mock_data)
 
 # Example output: {'user_id': '12345', 'username': 'test_user', ...}
 # Or: {'user_id': 12345, 'username': None, ...}
@@ -91,6 +91,34 @@ Changes the data type of a field. Currently supports `int` to `str` and `str` to
 -   **Mutation**:
     -   `int` -> `str` (e.g., `123` -> `'123'`)
     -   `str` -> `int` (e.g., `'456'` -> `456`). If the string is not a digit, it returns `-1`.
+
+### `RandomizationStrategy`
+
+Replaces a value with a randomized value of the same type. This is useful for testing how your system handles a wide range of valid but unexpected inputs. Saboteur provides several randomization strategies based on data type.
+
+-   **`IntegerRandomizationStrategy(from_value: int = -1000, to_value: int = 1000)`**
+    -   **Applicable when**: The original value is an `int`.
+    -   **Mutation**: Replaces the value with a random integer within the specified range (`from_value` to `to_value`).
+
+-   **`FloatRandomizationStrategy(from_value: float = -1000.0, to_value: float = 1000.0)`**
+    -   **Applicable when**: The original value is a `float`.
+    -   **Mutation**: Replaces the value with a random float within the specified range.
+
+-   **`StringRandomizationStrategy(length: int = 10)`**
+    -   **Applicable when**: The original value is a `str`.
+    -   **Mutation**: Replaces the value with a random alphanumeric string of the specified `length`.
+
+-   **`BooleanRandomizationStrategy`**
+    -   **Applicable when**: The original value is a `bool`.
+    -   **Mutation**: Replaces the value with a randomly chosen `True` or `False`.
+
+-   **`ListRandomizationStrategy`**
+    -   **Applicable when**: The original value is a `list`.
+    -   **Mutation**: Creates a new list of the same length by randomly sampling elements from the original list (with replacement).
+
+-   **`DictRandomizationStrategy`**
+    -   **Applicable when**: The original value is a `dict`.
+    -   **Mutation**: Replaces the dictionary with a new one where the order of keys is shuffled.
 
 ## ✍️ Creating a Custom Strategy
 
