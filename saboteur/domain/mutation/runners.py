@@ -2,7 +2,7 @@ import copy
 import time
 import random
 from typing import Dict, Any, List
-from saboteur.domain.base.runner import BaseRunner
+from saboteur.domain.base.runners import BaseRunner
 from saboteur.domain.mutation.configs import MutationConfig
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.contexts import MutationContext

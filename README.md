@@ -12,7 +12,7 @@ By "attacking" your data with various mutation strategies, Saboteur helps you un
 
 ## ✨ Key Features
 
--   **Simple API**: Get started in seconds with the intuitive `.mutate()` method.
+-   **Simple API**: Get started in seconds with the intuitive `.run()` method.
 -   **Randomized Mutations**: Automatically selects a random field and applies a random, applicable mutation to simulate real-world unpredictability.
 -   **Extensible**: Easily create and add your own custom mutation strategies to fit your specific needs.
 -   **Lightweighted Dependencies**: A pure Python library that can be dropped into any project without extra baggage.
@@ -38,7 +38,7 @@ from saboteur.application.facade import Saboteur
 from saboteur.infrastructure.mutation.strategies.injections import NullInjectionStrategy
 from saboteur.infrastructure.mutation.strategies.flippings import TypeFlipStrategy
 from saboteur.domain.mutation.configs import MutationConfig
-from saboteur.domain.mutation.runner import MutationRunner
+from saboteur.domain.mutation.runners import MutationRunner
 
 # 0. Prepare your data
 mock_data = {
@@ -70,12 +70,12 @@ saboteur = Saboteur(
     ]
 )
 
-# 4. Mutate the data!
+# 4. Mutate the data! (Run all runners respectively)
 # Saboteur will randomly pick one key (e.g., "user_id") and apply one
 # applicable strategy (e.g., TypeFlipStrategy).
 results = saboteur.run()
 
-# 5. Each runner's results is returned!
+# 5. Each runner's results is returned! (Key is id of runner object)
 # Example output: {4332166016: MutationResult(result={'age': 25, 'name': 'John', 'active': None, 'score': None, 'nested': {'height': 175.5, 'weight': 70, 'hobbies': ['reading', 'gaming'], 'nested_level_2': {'city': 'New York', 'country': 'USA'}}}, created_at='2026-03-02T07:47:15.115957+09:00', elapsed_time=3.724999260157347e-05)}
 print(results)
 ```

@@ -1,4 +1,4 @@
-from saboteur.domain.base.runner import BaseRunner
+from saboteur.domain.base.runners import BaseRunner
 
 
 class Saboteur:

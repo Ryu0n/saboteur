@@ -9,7 +9,7 @@ from saboteur.infrastructure.mutation.strategies.injections import NullInjection
 from saboteur.infrastructure.mutation.strategies.flippings import TypeFlipStrategy
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.configs import MutationConfig
-from saboteur.domain.mutation.runner import MutationRunner
+from saboteur.domain.mutation.runners import MutationRunner
 
 
 @pytest.fixture
