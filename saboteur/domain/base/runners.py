@@ -49,4 +49,3 @@ class AsyncBaseRunner(
 
     @abstractmethod
     async def run(self) -> T_Result: ...
-

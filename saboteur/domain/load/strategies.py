@@ -7,7 +7,9 @@ from saboteur.utils.logging import logger
 
 
 class LoadStrategy(AsyncBaseStrategy[LoadContext]):
-    async def _single_request(self, session: aiohttp.ClientSession, context: LoadContext) -> aiohttp.ClientResponse:
+    async def _single_request(
+        self, session: aiohttp.ClientSession, context: LoadContext
+    ) -> aiohttp.ClientResponse:
         kwargs = {
             "method": context.method,
             "url": context.url,
@@ -24,9 +26,10 @@ class LoadStrategy(AsyncBaseStrategy[LoadContext]):
     async def is_applicable(self, context: LoadContext) -> bool:
         try:
             async with aiohttp.ClientSession() as session:
-                response: aiohttp.ClientResponse = await self._single_request(session, context)
+                response: aiohttp.ClientResponse = await self._single_request(
+                    session, context
+                )
                 assert response.status < 400, "is_applicable Response is not OK"
                 return True
         except Exception as e:
             return False
-

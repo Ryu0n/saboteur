@@ -46,4 +46,3 @@ class LoadRunner(
             result=responses,
             elapsed_time=elapsed_time,
         )
-

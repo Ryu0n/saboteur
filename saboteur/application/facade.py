@@ -4,9 +4,17 @@ from saboteur.domain.base.runners import BaseRunner, AsyncBaseRunner
 class Saboteur:
     """Facade for the saboteur mutation framework."""
 
-    def __init__(self, runners: list[BaseRunner] = [], async_runners: list[AsyncBaseRunner] = []):
-        self.__runners = {id(runner): runner for runner in runners if isinstance(runner, BaseRunner)}
-        self.__async_runners = {id(runner): runner for runner in async_runners if isinstance(runner, AsyncBaseRunner)}
+    def __init__(
+        self, runners: list[BaseRunner] = [], async_runners: list[AsyncBaseRunner] = []
+    ):
+        self.__runners = {
+            id(runner): runner for runner in runners if isinstance(runner, BaseRunner)
+        }
+        self.__async_runners = {
+            id(runner): runner
+            for runner in async_runners
+            if isinstance(runner, AsyncBaseRunner)
+        }
 
     def register_runner(self, runner: BaseRunner):
         """Register a new runner to the saboteur."""

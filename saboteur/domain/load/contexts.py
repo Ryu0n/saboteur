@@ -6,6 +6,7 @@ from saboteur.domain.base.contexts import BaseContext
 @dataclass
 class LoadContext(BaseContext):
     """Context for HTTP request load testing."""
+
     url: str
     method: str
     headers: dict
