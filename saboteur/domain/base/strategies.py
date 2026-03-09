@@ -11,4 +11,13 @@ class BaseStrategy(ABC, Generic[T_Context]):
     def apply(self, context: T_Context) -> T_Context: ...
 
 
+class AsyncBaseStrategy(ABC, Generic[T_Context]):
+    @abstractmethod
+    async def is_applicable(self, context: T_Context) -> bool: ...
+
+    @abstractmethod
+    async def apply(self, context: T_Context) -> T_Context: ...
+
+
 T_Strategy = TypeVar("T_Strategy", bound=BaseStrategy)
+T_AsyncStrategy = TypeVar("T_AsyncStrategy", bound=AsyncBaseStrategy)

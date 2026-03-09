@@ -1,11 +1,12 @@
-from saboteur.domain.base.runners import BaseRunner
+from saboteur.domain.base.runners import BaseRunner, AsyncBaseRunner
 
 
 class Saboteur:
     """Facade for the saboteur mutation framework."""
 
-    def __init__(self, runners: list[BaseRunner]):
-        self.__runners = {id(runner): runner for runner in runners}
+    def __init__(self, runners: list[BaseRunner] = [], async_runners: list[AsyncBaseRunner] = []):
+        self.__runners = {id(runner): runner for runner in runners if isinstance(runner, BaseRunner)}
+        self.__async_runners = {id(runner): runner for runner in async_runners if isinstance(runner, AsyncBaseRunner)}
 
     def register_runner(self, runner: BaseRunner):
         """Register a new runner to the saboteur."""
@@ -29,5 +30,12 @@ class Saboteur:
         results = {}
         for id_runner, runner in self.__runners.items():
             result = runner.run()
+            results[id_runner] = result
+        return results
+
+    async def run_async(self) -> list:
+        results = {}
+        for id_runner, runner in self.__async_runners.items():
+            result = await runner.run()
             results[id_runner] = result
         return results
