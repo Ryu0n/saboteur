@@ -12,9 +12,10 @@ By "attacking" your data with various mutation strategies, Saboteur helps you un
 
 ## ✨ Key Features
 
--   **Simple API**: Get started in seconds with the intuitive `.run()` method.
+-   **Simple API**: Get started in seconds with the intuitive `.run()` or `.run_async()` methods.
 -   **Randomized Mutations**: Automatically selects a random field and applies a random, applicable mutation to simulate real-world unpredictability.
--   **Extensible**: Easily create and add your own custom mutation strategies to fit your specific needs.
+-   **API Load Testing**: Simulate heavy traffic and test the performance of your endpoints using customizable load strategies.
+-   **Extensible**: Easily create and add your own custom mutation or load strategies.
 -   **Lightweighted Dependencies**: A pure Python library that can be dropped into any project without extra baggage.
 
 ## 💾 Installation
@@ -80,6 +81,43 @@ results = saboteur.run()
 print(results)
 ```
 
+### ⚡ Load Testing Quick Start
+
+Saboteur now supports API load testing. You can run linear or custom load strategies asynchronously.
+
+```python
+import asyncio
+from saboteur.application.facade import Saboteur
+from saboteur.infrastructure.load.linear import LinearLoadStrategy
+from saboteur.domain.load.configs import LoadConfig
+from saboteur.domain.load.runners import LoadRunner
+
+async def main():
+    # 1. Define load strategies
+    strategies = [LinearLoadStrategy()]
+
+    # 2. Configure the load test
+    config = LoadConfig(
+        strategies=strategies,
+        url="https://api.example.com/data",
+        method="GET",
+        duration_seconds=10,
+        interval_seconds=1.0,
+        concurrency=5,
+    )
+
+    # 3. Initialize runner
+    runner = LoadRunner(config=config)
+    saboteur = Saboteur(async_runners=[runner])
+
+    # 4. Run the load test!
+    results = await saboteur.run_async()
+    print(results)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
 ## 🛠️ Available Strategies
 
 Saboteur comes with a set of built-in strategies to get you started.
@@ -130,6 +168,15 @@ Replaces a value with a randomized value of the same type. This is useful for te
     -   **Applicable when**: The original value is a `dict`.
     -   **Mutation**: Replaces the dictionary with a new one where the order of keys is shuffled.
 
+## Strategies for `LoadRunner`
+
+#### `LinearLoadStrategy`
+
+Sends requests at a fixed interval for a specified duration.
+
+-   **Description**: Distributes `concurrency` number of requests every `interval_seconds`.
+-   **Configurable via**: `LoadConfig` (duration, interval, concurrency).
+
 ## ✍️ Creating a Custom Strategy
 
 You can easily create your own strategies by inheriting from `MutationStrategy` and implementing two methods: `is_applicable` and `apply`.
@@ -178,7 +225,10 @@ Contributions are welcome! Whether it's adding new strategies, improving documen
 
 ## 🗺️ Roadmap
 
-Saboteur is currently focused on data mutation, but we plan to expand its capabilities. Future versions will include logic for **API load testing**, allowing you to simulate heavy traffic and test the performance and stability of your endpoints under stress.
+Saboteur is expanding to become a comprehensive resiliency testing tool. Future versions will include:
+-   **More Load Strategies**: Poisson distribution, ramping (step-up) load, etc.
+-   **Enhanced Reporting**: Visual summaries and performance metrics for load tests.
+-   **Protocol Support**: Expanding beyond HTTP (e.g., gRPC, WebSocket).
 
 ## 📄 License
 
