@@ -6,7 +6,7 @@ import asyncio
 from typing import List
 
 from saboteur.application.facade import Saboteur
-from saboteur.infrastructure.load.linear import LinearLoadStrategy
+from saboteur.infrastructure.load.strategies.linear import LinearLoadStrategy
 from saboteur.domain.load.strategies import LoadStrategy
 from saboteur.domain.load.configs import LoadConfig
 from saboteur.domain.load.runners import LoadRunner
