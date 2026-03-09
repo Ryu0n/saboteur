@@ -88,9 +88,10 @@ Saboteur now supports API load testing. You can run linear or custom load strate
 ```python
 import asyncio
 from saboteur.application.facade import Saboteur
-from saboteur.infrastructure.load.linear import LinearLoadStrategy
 from saboteur.domain.load.configs import LoadConfig
 from saboteur.domain.load.runners import LoadRunner
+from saboteur.infrastructure.load.strategies.linear import LinearLoadStrategy
+
 
 async def main():
     # 1. Define load strategies
