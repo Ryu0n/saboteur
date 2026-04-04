@@ -10,6 +10,7 @@ from saboteur.infrastructure.mutation.strategies.flippings import TypeFlipStrate
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.configs import MutationConfig
 from saboteur.domain.mutation.runners import MutationRunner
+from saboteur.domain.mutation.results import MutationResult
 
 
 @pytest.fixture
@@ -109,11 +110,63 @@ def test_saboteur_mutations(
     ]
 
     saboteur = Saboteur(runners=runners)
-    mutated_data = saboteur.run()
+    results = saboteur.run()
+    result = next(iter(results.values()))
 
     logger.debug(f"Original data: {mock_data}")
-    logger.debug(f"Mutated data: {mutated_data}")
+    logger.debug(f"Mutated data: {results}")
 
-    # assert isinstance(mutated_data, dict)
-    # assert set(mutated_data.keys()) == set(mock_data.keys())
-    # assert mock_data != mutated_data
+    assert isinstance(result, MutationResult)
+    assert isinstance(result.result, dict)
+    assert set(result.result.keys()) == set(mock_data.keys())
+    assert len(result.applied_mutations) <= max(1, len(strategies))
+
+
+def test_mutation_result_includes_trace_for_multiple_targets(mock_data):
+    runner = MutationRunner(
+        config=MutationConfig(
+            strategies=[
+                NullInjectionStrategy(),
+                TypeFlipStrategy(to_type=str),
+            ],
+            apply_all_strategies=False,
+            num_strategies_to_apply=1,
+            original_data=mock_data,
+            max_targets=2,
+            seed=42,
+        )
+    )
+
+    result = runner.run()
+
+    assert len(result.applied_mutations) == 2
+    assert [trace.key_path for trace in result.applied_mutations] == [
+        ["age"],
+        ["name"],
+    ]
+    assert [trace.strategy for trace in result.applied_mutations] == [
+        "NullInjectionStrategy",
+        "NullInjectionStrategy",
+    ]
+    assert result.result["age"] is None
+    assert result.result["name"] is None
+
+
+def test_mutation_seed_produces_reproducible_result(mock_data):
+    config = MutationConfig(
+        strategies=[
+            NullInjectionStrategy(),
+            TypeFlipStrategy(to_type=str),
+        ],
+        apply_all_strategies=False,
+        num_strategies_to_apply=1,
+        original_data=mock_data,
+        max_targets=2,
+        seed=5,
+    )
+
+    first_result = MutationRunner(config=config).run()
+    second_result = MutationRunner(config=config).run()
+
+    assert first_result.result == second_result.result
+    assert first_result.applied_mutations == second_result.applied_mutations

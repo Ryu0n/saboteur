@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from saboteur.domain.base.contexts import BaseContext
+from saboteur.domain.load.results import LoadRequestRecord
 
 
 @dataclass
@@ -14,4 +15,4 @@ class LoadContext(BaseContext):
     duration_seconds: int
     interval_seconds: float
     concurrency: int
-    responses: list[dict] = field(default_factory=list)
+    responses: list[LoadRequestRecord] = field(default_factory=list)

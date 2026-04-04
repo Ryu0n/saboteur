@@ -60,6 +60,8 @@ config = MutationConfig(
     strategies=strategies,
     apply_all_strategies=True,
     original_data=mock_data,
+    max_targets=2,
+    seed=42,
 )
 
 # 3. Initialize runners with corresponding configuration within Sabeteur Facade.
@@ -77,9 +79,22 @@ saboteur = Saboteur(
 results = saboteur.run()
 
 # 5. Each runner's results is returned! (Key is id of runner object)
-# Example output: {4332166016: MutationResult(result={'age': 25, 'name': 'John', 'active': None, 'score': None, 'nested': {'height': 175.5, 'weight': 70, 'hobbies': ['reading', 'gaming'], 'nested_level_2': {'city': 'New York', 'country': 'USA'}}}, created_at='2026-03-02T07:47:15.115957+09:00', elapsed_time=3.724999260157347e-05)}
+# Example output:
+# {
+#   4332166016: MutationResult(
+#     result={'age': None, 'name': None, 'active': True, 'score': None, 'nested': {...}},
+#     created_at='2026-03-02T07:47:15.115957+09:00',
+#     elapsed_time=3.724999260157347e-05,
+#     applied_mutations=[
+#       MutationTrace(key_path=['age'], strategy='NullInjectionStrategy', original_value=25, mutated_value=None),
+#       MutationTrace(key_path=['name'], strategy='NullInjectionStrategy', original_value='test_user', mutated_value=None),
+#     ]
+#   )
+# }
 print(results)
 ```
+
+`MutationConfig.max_targets` lets you mutate more than one randomly selected field in a single run, and `MutationConfig.seed` makes the selection reproducible.
 
 ### ⚡ Load Testing Quick Start
 
@@ -118,6 +133,8 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+
+Each `LoadResult` now includes raw request records in `result` and per-strategy summaries in `strategy_reports`, including `total_requests`, `success_rate`, latency metrics, and status code counts.
 
 ## 🛠️ Available Strategies
 

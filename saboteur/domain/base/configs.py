@@ -32,7 +32,7 @@ class BaseConfig(BaseModel, Generic[T_Strategy]):
         else:
             assert (
                 self.num_strategies_to_apply is not None
-                or self.num_strategies_to_apply > 0
+                and self.num_strategies_to_apply > 0
             ), (
                 "num_strategies_to_apply should be a positive integer or not None when apply_all_strategies is False."
             )

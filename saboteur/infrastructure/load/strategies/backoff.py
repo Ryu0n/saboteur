@@ -6,6 +6,7 @@ from dataclasses import replace
 import aiohttp
 
 from saboteur.domain.load.contexts import LoadContext
+from saboteur.domain.load.results import LoadRequestRecord
 from saboteur.domain.load.strategies import LoadStrategy
 
 
@@ -26,24 +27,20 @@ class ExponentialBackoffLoadStrategy(LoadStrategy):
         self.max_interval = max_interval
         self.jitter = jitter
 
-    async def _run_load_test(self, context: LoadContext) -> list[dict]:
-        results = []
-        start_time = time.time()
+    async def _run_load_test(self, context: LoadContext) -> list[LoadRequestRecord]:
+        results: list[LoadRequestRecord] = []
+        start_time = time.monotonic()
         attempt = 0
 
         async with aiohttp.ClientSession() as session:
-            while time.time() - start_time < context.duration_seconds:
+            while time.monotonic() - start_time < context.duration_seconds:
                 tasks = [
                     self._single_request(session, context)
                     for _ in range(context.concurrency)
                 ]
 
-                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
-                for res in batch_results:
-                    if isinstance(res, Exception):
-                        results.append({"status": 500, "error": str(res)})
-                    else:
-                        results.append({"status": res.status})
+                batch_results = await asyncio.gather(*tasks)
+                results.extend(batch_results)
 
                 # Calculate base wait time using exponential backoff
                 base_wait_time = min(
@@ -58,7 +55,7 @@ class ExponentialBackoffLoadStrategy(LoadStrategy):
                 else:
                     wait_time = base_wait_time
 
-                elapsed = time.time() - start_time
+                elapsed = time.monotonic() - start_time
                 if elapsed + wait_time < context.duration_seconds:
                     await asyncio.sleep(wait_time)
                 else:
