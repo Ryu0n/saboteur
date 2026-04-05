@@ -9,27 +9,27 @@ from saboteur.utils.generic import T
 
 @dataclass(frozen=True)
 class MutationContext(BaseContext, Generic[T]):
-    """Context for original value to be mutated.
+    """Context holding the value at a specific key path to be mutated.
 
     Args:
-        Generic (T): The type of the original value.
+        Generic (T): The type of the value.
     """
 
     key_paths: list[str]
-    original_value: T
-    original_type: Type[T]
+    value: T
+    value_type: Type[T]
 
     def mutate(self, data: dict) -> dict:
-        """Replace the original value in the data with the mutated value.
+        """Write self.value into data at the key path described by self.key_paths.
 
         Args:
             data (dict): The data to be mutated.
 
         Raises:
-            ValueError: _description_
+            ValueError: If the key path is invalid.
 
         Returns:
-            dict: The mutated data.
+            dict: A deep copy of data with the value replaced.
         """
         copied = copy.deepcopy(data)
         temp = copied
@@ -39,5 +39,5 @@ class MutationContext(BaseContext, Generic[T]):
             if not isinstance(temp, dict):
                 raise ValueError(f"Invalid key path: {self.key_paths}")
 
-        temp[self.key_paths[-1]] = self.original_value
+        temp[self.key_paths[-1]] = self.value
         return copied
