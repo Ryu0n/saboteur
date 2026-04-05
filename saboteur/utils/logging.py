@@ -1,4 +1,4 @@
 import logging
 
 logger = logging.getLogger("saboteur")
-logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.NullHandler())

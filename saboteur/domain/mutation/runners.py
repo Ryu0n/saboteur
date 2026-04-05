@@ -27,7 +27,7 @@ class MutationRunner(
         )
         return [
             MutationContext(
-                key_paths=key_paths, original_value=value, original_type=type(value)
+                key_paths=key_paths, value=value, value_type=type(value)
             )
             for key_paths, value in sampled_paths
         ]
@@ -49,17 +49,22 @@ class MutationRunner(
                     k=min(len(candidates), self._config.num_strategies_to_apply),
                 )
 
+            # Chain strategy applications: each strategy receives the output of the previous.
+            current_context = context
             for strategy in strategies_to_apply:
-                mutated = strategy.apply(context)
+                if not strategy.is_applicable(current_context):
+                    continue
+                mutated = strategy.apply(current_context)
                 _data = mutated.mutate(_data)
                 traces.append(
                     MutationTrace(
-                        key_path=context.key_paths,
+                        key_path=current_context.key_paths,
                         strategy=type(strategy).__name__,
-                        original_value=context.original_value,
-                        mutated_value=mutated.original_value,
+                        original_value=current_context.value,
+                        mutated_value=mutated.value,
                     )
                 )
+                current_context = mutated
 
         return _data, traces
 
@@ -75,9 +80,9 @@ class MutationRunner(
             if self._config.seed is not None:
                 random.setstate(random_state)
 
-        elasped = time.monotonic() - start
+        elapsed = time.monotonic() - start
         return MutationResult(
             result=mutated,
             applied_mutations=traces,
-            elapsed_time=elasped,
+            elapsed_time=elapsed,
         )

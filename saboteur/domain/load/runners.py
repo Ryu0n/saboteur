@@ -49,7 +49,7 @@ class LoadRunner(
             concurrency=config.concurrency,
         )
 
-    async def load(self) -> dict:
+    async def load(self) -> tuple[dict, list[LoadStrategyReport]]:
         responses = {}
         strategy_reports: list[LoadStrategyReport] = []
         context = self._wrap_into_context(self._config)
