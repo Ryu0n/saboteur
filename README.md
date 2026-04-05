@@ -146,45 +146,45 @@ Saboteur comes with a set of built-in strategies to get you started.
 
 Replaces the original value of a field with `None`. This is useful for testing how your code handles missing or null data.
 
--   **Applicable when**: The original value is not `None`.
--   **Mutation**: `original_value` -> `None`
+-   **Applicable when**: The field value is not `None`.
+-   **Mutation**: `value` -> `None`
 
-#### `TypeFlipStrategy`
+#### `TypeFlipStrategy(to_type=None)`
 
-Changes the data type of a field. Currently supports `int` to `str` and `str` to `int` conversions. This helps test for `TypeError` exceptions and weak typing issues.
+Changes the data type of a field. By default a target type is randomly chosen at instantiation time from `(int, float, str, bool, list)`. You can pin a specific type by passing `to_type` explicitly.
 
--   **Applicable when**: The original value is an `int` or a `str`.
--   **Mutation**:
-    -   `int` -> `str` (e.g., `123` -> `'123'`)
-    -   `str` -> `int` (e.g., `'456'` -> `456`). If the string is not a digit, it returns `-1`.
+-   **Applicable when**: The current value can be successfully cast to the target type without raising `ValueError` or `TypeError`.
+-   **Mutation**: `value` -> `to_type(value)` (e.g., `123` -> `'123'`, `'3.14'` -> `3.14`)
+
+> **Note**: Each `TypeFlipStrategy()` call independently draws a random target type. Two instances created without arguments are not guaranteed to use the same type.
 
 #### `RandomizationStrategy`
 
 Replaces a value with a randomized value of the same type. This is useful for testing how your system handles a wide range of valid but unexpected inputs. Saboteur provides several randomization strategies based on data type.
 
 -   **`IntegerRandomizationStrategy(from_value: int = -1000, to_value: int = 1000)`**
-    -   **Applicable when**: The original value is an `int`.
+    -   **Applicable when**: The field value is an `int`.
     -   **Mutation**: Replaces the value with a random integer within the specified range (`from_value` to `to_value`).
 
 -   **`FloatRandomizationStrategy(from_value: float = -1000.0, to_value: float = 1000.0)`**
-    -   **Applicable when**: The original value is a `float`.
+    -   **Applicable when**: The field value is a `float`.
     -   **Mutation**: Replaces the value with a random float within the specified range.
 
 -   **`StringRandomizationStrategy(length: int = 10)`**
-    -   **Applicable when**: The original value is a `str`.
+    -   **Applicable when**: The field value is a `str`.
     -   **Mutation**: Replaces the value with a random alphanumeric string of the specified `length`.
 
 -   **`BooleanRandomizationStrategy`**
-    -   **Applicable when**: The original value is a `bool`.
+    -   **Applicable when**: The field value is a `bool`.
     -   **Mutation**: Replaces the value with a randomly chosen `True` or `False`.
 
 -   **`ListRandomizationStrategy`**
-    -   **Applicable when**: The original value is a `list`.
+    -   **Applicable when**: The field value is a non-empty `list`.
     -   **Mutation**: Creates a new list of the same length by randomly sampling elements from the original list (with replacement).
 
 -   **`DictRandomizationStrategy`**
-    -   **Applicable when**: The original value is a `dict`.
-    -   **Mutation**: Replaces the dictionary with a new one where the order of keys is shuffled.
+    -   **Applicable when**: The field value is a `dict` with more than one key.
+    -   **Mutation**: Reassigns values to keys in a random order, so the key→value mapping changes (e.g., `{"a": 1, "b": 2}` → `{"a": 2, "b": 1}`).
 
 ## Strategies for `LoadRunner`
 
@@ -195,15 +195,60 @@ Sends requests at a fixed interval for a specified duration.
 -   **Description**: Distributes `concurrency` number of requests every `interval_seconds`.
 -   **Configurable via**: `LoadConfig` (duration, interval, concurrency).
 
+#### `ExponentialBackoffLoadStrategy(initial_interval, multiplier, max_interval, jitter)`
+
+Sends request batches with exponentially increasing wait times between each batch.
+
+-   **Description**: After each batch, the wait time grows by `multiplier` up to `max_interval`. When `jitter=True` (default), a random value between `0` and the computed wait time is used instead to avoid thundering-herd effects.
+-   **Configurable via**: `LoadConfig` plus constructor parameters.
+
+```python
+from saboteur.infrastructure.load.strategies.backoff import ExponentialBackoffLoadStrategy
+
+strategy = ExponentialBackoffLoadStrategy(
+    initial_interval=1.0,   # start with 1 s
+    multiplier=2.0,         # double each time
+    max_interval=60.0,      # cap at 60 s
+    jitter=True,            # add randomness (default)
+)
+```
+
+## 🔧 Managing Runners at Runtime
+
+`Saboteur` exposes management methods so you can register and unregister runners after construction.
+
+```python
+saboteur = Saboteur()
+
+# Sync runners
+saboteur.register_runner(runner)
+saboteur.unregister_runner(runner)
+saboteur.list_runners()          # -> list[BaseRunner]
+saboteur.get_runner(id(runner))  # -> BaseRunner | None
+
+# Async runners
+saboteur.register_async_runner(async_runner)
+saboteur.unregister_async_runner(async_runner)
+saboteur.list_async_runners()          # -> list[AsyncBaseRunner]
+saboteur.get_async_runner(id(runner))  # -> AsyncBaseRunner | None
+```
+
 ## ✍️ Creating a Custom Strategy
 
 You can easily create your own strategies by inheriting from `MutationStrategy` and implementing two methods: `is_applicable` and `apply`.
+
+`MutationContext` exposes the following fields:
+
+| Field | Description |
+|---|---|
+| `key_paths` | List of keys representing the nested path to the target field. |
+| `value` | The current value at that path (before or after a mutation). |
+| `value_type` | The Python type of `value`. |
 
 Here's an example of a `BooleanFlipStrategy` that flips `True` to `False` and vice-versa.
 
 ```python
 # custom_strategies.py
-from typing import Any
 from saboteur.domain.mutation.strategies import MutationStrategy
 from saboteur.domain.mutation.contexts import MutationContext
 from saboteur.domain.mutation.configs import MutationConfig
@@ -211,13 +256,19 @@ from saboteur.domain.mutation.configs import MutationConfig
 
 class BooleanFlipStrategy(MutationStrategy):
     """Flips a boolean value."""
+
     def is_applicable(self, context: MutationContext) -> bool:
         # This strategy only applies to boolean types
-        return isinstance(context.original_value, bool)
+        return context.value_type is bool
 
-    def apply(self, context: MutationContext) -> Any:
-        # The mutation logic is simple: flip the boolean
-        return not context.original_value
+    def apply(self, context: MutationContext) -> MutationContext:
+        # Return a new MutationContext with the flipped value
+        return MutationContext(
+            key_paths=context.key_paths,
+            value=not context.value,
+            value_type=bool,
+        )
+
 
 # You can then use it with Saboteur:
 strategies = [
@@ -227,7 +278,7 @@ strategies = [
 
 config = MutationConfig(
     strategies=strategies,
-    ... # other options
+    original_data={"is_active": True},
 )
 ```
 
