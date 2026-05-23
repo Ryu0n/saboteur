@@ -27,6 +27,14 @@ class LoadConfig(BaseConfig[LoadStrategy]):
         gt=0,
         description="Interval between requests in seconds. (For linear load strategy)",
     )
+    random_interval: tuple[float, float] = Field(
+        default=(0.0, 1.0),
+        description="(min, max) interval in seconds between batches. (For random load strategy)",
+    )
     concurrency: int = Field(
         default=1, gt=0, description="Number of concurrent requests."
+    )
+    seed: int | None = Field(
+        default=None,
+        description="Optional random seed for reproducible interval sampling.",
     )

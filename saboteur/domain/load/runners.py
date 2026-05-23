@@ -1,3 +1,4 @@
+import random
 import time
 from collections import Counter
 
@@ -47,6 +48,7 @@ class LoadRunner(
             duration_seconds=config.duration_seconds,
             interval_seconds=config.interval_seconds,
             concurrency=config.concurrency,
+            random_interval=config.random_interval,
         )
 
     async def load(self) -> tuple[dict, list[LoadStrategyReport]]:
@@ -72,7 +74,16 @@ class LoadRunner(
 
     async def run(self) -> LoadResult:
         start = time.monotonic()
-        responses, strategy_reports = await self.load()
+        random_state = random.getstate()
+        if self._config.seed is not None:
+            random.seed(self._config.seed)
+
+        try:
+            responses, strategy_reports = await self.load()
+        finally:
+            if self._config.seed is not None:
+                random.setstate(random_state)
+
         elapsed_time = time.monotonic() - start
         return LoadResult(
             result=responses,

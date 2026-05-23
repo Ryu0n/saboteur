@@ -15,4 +15,5 @@ class LoadContext(BaseContext):
     duration_seconds: int
     interval_seconds: float
     concurrency: int
+    random_interval: tuple[float, float] = (0.0, 1.0)
     responses: list[LoadRequestRecord] = field(default_factory=list)
